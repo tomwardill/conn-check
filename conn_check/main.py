@@ -1,3 +1,9 @@
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import map
+from builtins import object
 from argparse import ArgumentParser
 from collections import defaultdict
 import sys
@@ -35,7 +41,7 @@ def check_from_description(check_description):
     check = CHECKS.get(_type, None)
     if check is None:
         raise AssertionError("Unknown check type: {}, available checks: {}"
-                             .format(_type, CHECKS.keys()))
+                             .format(_type, list(CHECKS.keys())))
     for arg in check['args']:
         if arg not in check_description:
             raise AssertionError('{} missing from check: {}'.format(arg,
@@ -69,13 +75,9 @@ def build_checks(check_descriptions, connect_timeout, include_tags,
         new_desc.update(desc)
         return new_desc
 
-    check_descriptions = filter(
-        lambda c: filter_tags(c, include_tags, exclude_tags),
-        check_descriptions)
+    check_descriptions = [c for c in check_descriptions if filter_tags(c, include_tags, exclude_tags)]
 
-    subchecks = map(
-        lambda c: check_from_description(c),
-        map(set_timeout, check_descriptions))
+    subchecks = [check_from_description(c) for c in list(map(set_timeout, check_descriptions))]
 
     if skip_checks:
         strategy_wrapper = skipping_check
@@ -113,7 +115,7 @@ class TimestampOutput(object):
         self.output = output
 
     def write(self, data):
-        self.output.write("{:.3f}: {}".format(time.time() - self.start, data))
+        self.output.write(u"{:.3f}: {}".format(time.time() - self.start, data))
 
 
 class OrderedOutput(object):
@@ -127,7 +129,7 @@ class OrderedOutput(object):
         self.skipped = []
 
     def write(self, data):
-        if data[:7] == 'SKIPPED':
+        if data[:7] == u'SKIPPED':
             self.skipped.append(data)
             return
 
@@ -141,7 +143,7 @@ class OrderedOutput(object):
             pass
         name = ':'.join(name_parts)
 
-        if message[0:6] == 'FAILED':
+        if message[0:6] == u'FAILED':
             self.failed[name].append(data)
         else:
             self.messages[name].append(data)
@@ -150,10 +152,10 @@ class OrderedOutput(object):
         for _type in ('failed', 'messages'):
             for name, messages in sorted(getattr(self, _type).items()):
                 messages.sort()
-                map(self.output.write, messages)
+                list(map(self.output.write, messages))
 
         self.skipped.sort()
-        map(self.output.write, self.skipped)
+        list(map(self.output.write, self.skipped))
 
 
 class ConsoleOutput(ResultTracker):
@@ -169,33 +171,33 @@ class ConsoleOutput(ResultTracker):
 
     def format_duration(self, duration):
         if not self.show_duration:
-            return ""
-        return ": ({:.3f} ms)".format(duration)
+            return u""
+        return u": ({:.3f} ms)".format(duration)
 
     def notify_start(self, name, info):
         """Register the start of a check."""
         if self.verbose:
             if info:
-                info = " ({})".format(info)
+                info = u" ({})".format(info)
             else:
-                info = ''
-            self.output.write("Starting {}{}...\n".format(name, info))
+                info = u''
+            self.output.write(u"Starting {}{}...\n".format(name, info))
 
     def notify_skip(self, name):
         """Register a check being skipped."""
-        self.output.write("SKIPPED: {}\n".format(name))
+        self.output.write(u"SKIPPED: {}\n".format(name))
 
     def notify_success(self, name, duration):
         """Register a success."""
-        self.output.write("{} OK{}\n".format(
+        self.output.write(u"{} OK{}\n".format(
             name, self.format_duration(duration)))
 
     def notify_failure(self, name, info, exc_info, duration):
         """Register a failure."""
         message = str(exc_info[1]).split("\n")[0]
         if info:
-            message = "({}) {}".format(info, message)
-        self.output.write("{} FAILED{} - {}\n".format(
+            message = u"({}) {}".format(info, message)
+        self.output.write(u"{} FAILED{} - {}\n".format(
             name, self.format_duration(duration), message))
 
         if self.show_tracebacks:
@@ -203,11 +205,11 @@ class ConsoleOutput(ResultTracker):
                                                    exc_info[1],
                                                    exc_info[2],
                                                    None)
-            lines = "".join(formatted).split("\n")
+            lines = u"".join(formatted).split("\n")
             if len(lines) > 0 and len(lines[-1]) == 0:
                 lines.pop()
-            indented = "\n".join(["  {}".format(line) for line in lines])
-            self.output.write("{}\n".format(indented))
+            indented = u"\n".join(["  {}".format(line) for line in lines])
+            self.output.write(u"{}\n".format(indented))
 
 
 class Command(object):
@@ -310,7 +312,7 @@ class Command(object):
         options.exclude_tags = exclude_tags
 
         if options.patterns:
-            self.patterns = SumPattern(map(SimplePattern, options.patterns))
+            self.patterns = SumPattern(list(map(SimplePattern, options.patterns)))
         else:
             self.patterns = SimplePattern("*")
         self.options = options

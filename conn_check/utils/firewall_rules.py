@@ -1,3 +1,4 @@
+from builtins import object
 import sys
 import socket
 import yaml
@@ -54,7 +55,7 @@ class FirewallRulesOutput(object):
     def flush(self):
         """Outputs our structured egress firewall info as YAML."""
 
-        self.output.write(yaml.dump({'egress': self.output_data.values()}))
+        self.output.write(yaml.dump({'egress': list(self.output_data.values())}))
 
 
 class FirewallExportCommand(Command):

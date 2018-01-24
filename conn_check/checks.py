@@ -1,9 +1,11 @@
+from future import standard_library
+standard_library.install_aliases()
 from email.mime.text import MIMEText
 import glob
 import os
 from pkg_resources import resource_stream
-from StringIO import StringIO
-import urlparse
+from io import StringIO
+import urllib.parse
 
 from OpenSSL import SSL
 from OpenSSL.crypto import load_certificate, FILETYPE_PEM
@@ -57,7 +59,7 @@ def load_tls_certs(path):
             # Now, de-duplicate in case the same cert has multiple names.
             cert_map[x509.digest('sha1')] = x509
 
-    CA_CERTS.extend(cert_map.values())
+    CA_CERTS.extend(list(cert_map.values()))
 
 
 class TCPCheckProtocol(Protocol):
@@ -195,7 +197,7 @@ def make_udp_check(host, port, send, expect, timeout=None,
 
 
 def extract_host_port(url):
-    parsed = urlparse.urlparse(url)
+    parsed = urllib.parse.urlparse(url)
     host = parsed.hostname
     port = parsed.port
     scheme = parsed.scheme
@@ -483,9 +485,9 @@ def make_mongodb_check(host, port=27017, username=None, password=None,
 
     def timeout_handler():
         """Manual timeout handler as txmongo timeout args don't always work."""
-        if 'deferred' in do_connect.func_dict:
+        if 'deferred' in do_connect.__dict__:
             err = ValueError("timeout connecting to mongodb")
-            do_connect.func_dict['deferred'].errback(err)
+            do_connect.__dict__['deferred'].errback(err)
 
     if any((username, password)):
         connect_info = "connect with auth"

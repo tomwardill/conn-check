@@ -1,3 +1,4 @@
+from builtins import object
 import sys
 import time
 
@@ -18,7 +19,7 @@ def maybeDeferred(f, *args, **kwargs):
     function dict so we can track if something is a deferred.
     """
     deferred = _maybeDeferred(f, *args, **kwargs)
-    f.func_dict['deferred'] = deferred
+    f.__dict__['deferred'] = deferred
     return deferred
 
 

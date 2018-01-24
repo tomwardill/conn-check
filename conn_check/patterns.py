@@ -1,3 +1,5 @@
+from builtins import map
+from builtins import object
 import re
 
 
@@ -66,7 +68,7 @@ def tokens_to_partial_re(tokens):
             end = "".join([")?" for c in chars])
             return (begin, end, end)
 
-    subexprs = map(token_to_re, tokens)
+    subexprs = list(map(token_to_re, tokens))
     if len(subexprs) > 0:
         # subexpressions like (.*)? aren't accepted, so we may have to use
         # an alternate closing form for the last (innermost) subexpression
@@ -87,7 +89,7 @@ def tokens_to_re(tokens):
         else:
             return re.escape(token)
 
-    return re.compile("".join(map(token_to_re, tokens) + [r'\Z']))
+    return re.compile("".join(list(map(token_to_re, tokens)) + [r'\Z']))
 
 
 class SimplePattern(Pattern):

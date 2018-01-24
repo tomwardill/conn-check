@@ -1,3 +1,4 @@
+from builtins import str
 from argparse import ArgumentParser
 from netaddr import IPNetwork
 from socket import gethostbyname
@@ -61,7 +62,7 @@ def merge_yaml(paths, use_from=False):
                 if ports_diff:
                     merged_rules[key]['ports'] = ports + ports_diff
 
-    return merged_rules.values()
+    return list(merged_rules.values())
 
 
 def generate_commands(cmd, rules, group=None):
@@ -91,7 +92,7 @@ def run(*args):
                         " name.")
     options = parser.parse_args(list(args))
 
-    available_commands = COMMANDS.keys() + COMMAND_ALIASES.keys()
+    available_commands = list(COMMANDS.keys()) + list(COMMAND_ALIASES.keys())
     output_type = options.output_type.lower()
     if output_type not in available_commands:
         sys.stderr.write('Error: invalid output type ({})\n'.format(
