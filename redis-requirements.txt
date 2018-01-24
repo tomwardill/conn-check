@@ -1,1 +1,1 @@
-txredis
+https://github.com/tdsmith/txRedis/archive/f52e5c7356352f5fd35e62e28d058ee4c0f12282.zip

@@ -8,3 +8,4 @@ requests
 Twisted
 txrequests >= 0.9
 PyYAML
+future

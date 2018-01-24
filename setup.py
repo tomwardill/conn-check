@@ -33,11 +33,11 @@ setup(
     packages=find_packages(exclude=['ez_setup']),
     install_requires=get_requirements(),
     extras_require={
-        'all': get_requirements('amqp', 'postgres', 'redis', 'mongodb',
+        'all': get_requirements('amqp', 'postgres', 'mongodb',
                                 'fwutils'),
         'amqp': get_requirements('amqp'),
         'postgres': get_requirements('postgres'),
-        'redis': get_requirements('redis'),
+        # 'redis': get_requirements('redis'),
         'mongodb': get_requirements('mongodb'),
         'fwutil': get_requirements('fwutils'),
     },
