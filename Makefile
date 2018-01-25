@@ -18,7 +18,8 @@ build: $(ENV)
 	$(ENV)/bin/python setup.py develop
 
 test: $(ENV)
-	$(ENV)/bin/nosetests
+	$(ENV)/bin/pip install -r test-requirements.txt
+	$(ENV)/bin/tox
 
 clean-wheels:
 	-rm -r $(WHEELS_DIR)
