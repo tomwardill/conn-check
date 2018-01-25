@@ -2,10 +2,11 @@ from future import standard_library
 standard_library.install_aliases()
 from builtins import map
 from builtins import str
+from io import StringIO
 import operator
 import random
+import sys
 import testtools
-from io import StringIO
 
 from testtools import matchers
 
@@ -190,6 +191,8 @@ class ConnCheckTest(testtools.TestCase):
                 FunctionCheckMatcher('postgres:/local.sock:8080', 'user foo', blocking=True))
 
     def test_make_redis_check(self):
+        if sys.version_info[0] >= 3:
+            raise self.skipException('Redis checks not supported in python 3')
         result = make_redis_check('localhost', 8080)
         self.assertIsInstance(result, PrefixCheckWrapper)
         self.assertEqual(result.prefix, 'redis:localhost:8080:')
@@ -202,6 +205,8 @@ class ConnCheckTest(testtools.TestCase):
         self.assertThat(wrapped.subchecks[1], FunctionCheckMatcher('connect', None))
 
     def test_make_redis_check_with_password(self):
+        if sys.version_info[0] >= 3:
+            raise self.skipException('Redis checks not supported in python 3')
         result = make_redis_check('localhost', 8080, 'foobar')
         self.assertIsInstance(result, PrefixCheckWrapper)
         self.assertEqual(result.prefix, 'redis:localhost:8080:')

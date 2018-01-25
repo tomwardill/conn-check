@@ -2,9 +2,10 @@ from future import standard_library
 standard_library.install_aliases()
 from email.mime.text import MIMEText
 import glob
+from io import StringIO
 import os
 from pkg_resources import resource_stream
-from io import StringIO
+import sys
 import urllib.parse
 
 from OpenSSL import SSL
@@ -399,6 +400,8 @@ def make_postgres_check(host, port, username, password, database,
 def make_redis_check(host, port, password=None, timeout=None,
                      **kwargs):
     """Make a check for the configured redis server."""
+    if sys.version_info[0] >=3:
+        raise EnvironmentError('Redis checks are not supported in python 3')
     import txredis
     subchecks = []
     subchecks.append(make_tcp_check(host, port, timeout=timeout))

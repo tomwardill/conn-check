@@ -5,6 +5,7 @@ import os
 cwd = os.path.dirname(__file__)
 __version__ = open(os.path.join(cwd, 'conn_check/version.txt'),
                    'r').read().strip()
+import sys
 
 from setuptools import setup, find_packages
 
@@ -22,6 +23,29 @@ def get_requirements(*pre):
     return extras
 
 
+# redis checks are not supported in python 3
+# due to lack of upstream support in the library
+if sys.version_info[0] == 2:
+    extras_require = {
+        'all': get_requirements('amqp', 'redis', 'postgres', 'mongodb',
+                                'fwutils'),
+        'amqp': get_requirements('amqp'),
+        'postgres': get_requirements('postgres'),
+        'redis': get_requirements('redis'),
+        'mongodb': get_requirements('mongodb'),
+        'fwutil': get_requirements('fwutils'),
+    }
+else:
+     extras_require = {
+        'all': get_requirements('amqp', 'postgres', 'mongodb',
+                                'fwutils'),
+        'amqp': get_requirements('amqp'),
+        'postgres': get_requirements('postgres'),
+        'mongodb': get_requirements('mongodb'),
+        'fwutil': get_requirements('fwutils'),
+    }
+
+
 setup(
     name='conn-check',
     description='Utility for verifying connectivity between services',
@@ -31,16 +55,8 @@ setup(
     author_email='james.westby@canonical.com, wesley.mason@canonical.com',
     url='http://conn-check.org/',
     packages=find_packages(exclude=['ez_setup']),
-    #install_requires=get_requirements(),
-    extras_require={
-        'all': get_requirements('amqp', 'postgres', 'mongodb',
-                                'fwutils'),
-        'amqp': get_requirements('amqp'),
-        'postgres': get_requirements('postgres'),
-        # 'redis': get_requirements('redis'),
-        'mongodb': get_requirements('mongodb'),
-        'fwutil': get_requirements('fwutils'),
-    },
+    install_requires=get_requirements(),
+    extras_require=extras_require,
     package_data={'conn_check': ['version.txt', 'amqp0-8.xml']},
     include_package_data=True,
     entry_points={
