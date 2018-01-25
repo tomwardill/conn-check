@@ -6,6 +6,7 @@ pyOpenSSL
 service-identity
 requests
 Twisted
-txrequests >= 0.9
+#txrequests >= 0.9
+https://github.com/keller00/txrequests/archive/master.zip
 PyYAML
 future

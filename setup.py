@@ -31,7 +31,7 @@ setup(
     author_email='james.westby@canonical.com, wesley.mason@canonical.com',
     url='http://conn-check.org/',
     packages=find_packages(exclude=['ez_setup']),
-    install_requires=get_requirements(),
+    #install_requires=get_requirements(),
     extras_require={
         'all': get_requirements('amqp', 'postgres', 'mongodb',
                                 'fwutils'),
