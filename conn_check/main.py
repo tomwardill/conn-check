@@ -1,4 +1,5 @@
 from __future__ import print_function
+from __future__ import unicode_literals
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
@@ -115,7 +116,7 @@ class TimestampOutput(object):
         self.output = output
 
     def write(self, data):
-        self.output.write(u"{:.3f}: {}".format(time.time() - self.start, data))
+        self.output.write("{:.3f}: {}".format(time.time() - self.start, data))
 
 
 class OrderedOutput(object):
@@ -129,7 +130,7 @@ class OrderedOutput(object):
         self.skipped = []
 
     def write(self, data):
-        if data[:7] == u'SKIPPED':
+        if data[:7] == 'SKIPPED':
             self.skipped.append(data)
             return
 
@@ -143,7 +144,7 @@ class OrderedOutput(object):
             pass
         name = ':'.join(name_parts)
 
-        if message[0:6] == u'FAILED':
+        if message[0:6] == 'FAILED':
             self.failed[name].append(data)
         else:
             self.messages[name].append(data)
@@ -171,33 +172,33 @@ class ConsoleOutput(ResultTracker):
 
     def format_duration(self, duration):
         if not self.show_duration:
-            return u""
-        return u": ({:.3f} ms)".format(duration)
+            return ""
+        return ": ({:.3f} ms)".format(duration)
 
     def notify_start(self, name, info):
         """Register the start of a check."""
         if self.verbose:
             if info:
-                info = u" ({})".format(info)
+                info = " ({})".format(info)
             else:
-                info = u''
-            self.output.write(u"Starting {}{}...\n".format(name, info))
+                info = ''
+            self.output.write("Starting {}{}...\n".format(name, info))
 
     def notify_skip(self, name):
         """Register a check being skipped."""
-        self.output.write(u"SKIPPED: {}\n".format(name))
+        self.output.write("SKIPPED: {}\n".format(name))
 
     def notify_success(self, name, duration):
         """Register a success."""
-        self.output.write(u"{} OK{}\n".format(
+        self.output.write("{} OK{}\n".format(
             name, self.format_duration(duration)))
 
     def notify_failure(self, name, info, exc_info, duration):
         """Register a failure."""
         message = str(exc_info[1]).split("\n")[0]
         if info:
-            message = u"({}) {}".format(info, message)
-        self.output.write(u"{} FAILED{} - {}\n".format(
+            message = "({}) {}".format(info, message)
+        self.output.write("{} FAILED{} - {}\n".format(
             name, self.format_duration(duration), message))
 
         if self.show_tracebacks:
@@ -205,11 +206,11 @@ class ConsoleOutput(ResultTracker):
                                                    exc_info[1],
                                                    exc_info[2],
                                                    None)
-            lines = u"".join(formatted).split("\n")
+            lines = "".join(formatted).split("\n")
             if len(lines) > 0 and len(lines[-1]) == 0:
                 lines.pop()
-            indented = u"\n".join(["  {}".format(line) for line in lines])
-            self.output.write(u"{}\n".format(indented))
+            indented = "\n".join(["  {}".format(line) for line in lines])
+            self.output.write("{}\n".format(indented))
 
 
 class Command(object):
@@ -253,7 +254,7 @@ class Command(object):
         parser.add_argument("--connect-timeout", dest="connect_timeout",
                             action="store", default=10, type=float,
                             help="Network connection timeout.")
-        parser.add_argument("-U", "--unbuffered-output", dest="buffer_output",
+        parser.add_argument("-", "--unbuffered-output", dest="buffer_output",
                             action="store_false", default=True,
                             help="Don't buffer output, write to STDOUT right "
                             "away.")

@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from future import standard_library
 standard_library.install_aliases()
 from builtins import map
@@ -355,26 +357,26 @@ class ConnCheckTest(testtools.TestCase):
 
     def test_ordered_output(self):
         lines = [
-            u'SKIPPED: xyz3:localhost:666\n',
-            u'bar2:localhost:8080 FAILED: error\n',
-            u'SKIPPED: foo2:localhost:8080\n',
-            u'baz2:localhost:42 OK\n',
-            u'SKIPPED: bar2:localhost:8080\n',
-            u'xyz2:localhost:666 FAILED: error\n',
-            u'xyz1:localhost:666 OK\n',
-            u'foo1:localhost:8080 FAILED: error\n',
-            u'baz1:localhost:42 OK\n',
+            'SKIPPED: xyz3:localhost:666\n',
+            'bar2:localhost:8080 FAILED: error\n',
+            'SKIPPED: foo2:localhost:8080\n',
+            'baz2:localhost:42 OK\n',
+            'SKIPPED: bar2:localhost:8080\n',
+            'xyz2:localhost:666 FAILED: error\n',
+            'xyz1:localhost:666 OK\n',
+            'foo1:localhost:8080 FAILED: error\n',
+            'baz1:localhost:42 OK\n',
         ]
         expected = (
-            u'bar2:localhost:8080 FAILED: error\n'
-            u'foo1:localhost:8080 FAILED: error\n'
-            u'xyz2:localhost:666 FAILED: error\n'
-            u'baz1:localhost:42 OK\n'
-            u'baz2:localhost:42 OK\n'
-            u'xyz1:localhost:666 OK\n'
-            u'SKIPPED: bar2:localhost:8080\n'
-            u'SKIPPED: foo2:localhost:8080\n'
-            u'SKIPPED: xyz3:localhost:666\n'
+            'bar2:localhost:8080 FAILED: error\n'
+            'foo1:localhost:8080 FAILED: error\n'
+            'xyz2:localhost:666 FAILED: error\n'
+            'baz1:localhost:42 OK\n'
+            'baz2:localhost:42 OK\n'
+            'xyz1:localhost:666 OK\n'
+            'SKIPPED: bar2:localhost:8080\n'
+            'SKIPPED: foo2:localhost:8080\n'
+            'SKIPPED: xyz3:localhost:666\n'
         )
 
         output = OrderedOutput(StringIO())
