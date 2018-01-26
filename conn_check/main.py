@@ -33,6 +33,30 @@ from .patterns import (
     )
 
 
+def setup_reactor(max_timeout):
+    """Setup the Twisted reactor with required customisations."""
+
+    def make_daemon_thread(*args, **kw):
+        """Create a daemon thread."""
+        thread = Thread(*args, **kw)
+        thread.daemon = True
+        return thread
+
+    threadpool = ThreadPool(minthreads=1)
+    threadpool.threadFactory = make_daemon_thread
+    reactor.threadpool = threadpool
+    reactor.callWhenRunning(threadpool.start)
+
+    if max_timeout is not None:
+        def terminator():
+            # Hasta la vista, twisted
+            reactor.stop()
+            print('Maximum timeout reached: {}s'.format(max_timeout))
+
+        reactor.callLater(max_timeout, terminator)
+    return reactor
+
+
 def check_from_description(check_description):
     _type = check_description['type']
 
@@ -75,7 +99,6 @@ def build_checks(check_descriptions, connect_timeout, include_tags,
         new_desc = dict(timeout=connect_timeout)
         new_desc.update(desc)
         return new_desc
-
     check_descriptions = [c for c in check_descriptions if filter_tags(c, include_tags, exclude_tags)]
 
     subchecks = [check_from_description(c) for c in list(map(set_timeout, check_descriptions))]
@@ -272,29 +295,6 @@ class Command(object):
                            help="Comma separated list of tags to exclude.")
         self.parser = parser
 
-    def setup_reactor(self):
-        """Setup the Twisted reactor with required customisations."""
-
-        def make_daemon_thread(*args, **kw):
-            """Create a daemon thread."""
-            thread = Thread(*args, **kw)
-            thread.daemon = True
-            return thread
-
-        threadpool = ThreadPool(minthreads=1)
-        threadpool.threadFactory = make_daemon_thread
-        reactor.threadpool = threadpool
-        reactor.callWhenRunning(threadpool.start)
-
-        if self.options.max_timeout is not None:
-            def terminator():
-                # Hasta la vista, twisted
-                reactor.stop()
-                print('Maximum timeout reached: {}s'.format(
-                      self.options.max_timeout))
-
-            reactor.callLater(self.options.max_timeout, terminator)
-
     def parse_options(self, args):
         """Parse args (e.g. sys.argv) into options and set some config."""
 
@@ -356,7 +356,7 @@ class Command(object):
             if not self.options.dry_run:
                 load_tls_certs(self.options.cacerts_path)
 
-            self.setup_reactor()
+            setup_reactor(self.options.max_timeout)
             reactor.callWhenRunning(run_checks, checks, self.patterns,
                                     self.results)
             reactor.run()
