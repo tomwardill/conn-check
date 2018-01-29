@@ -1,5 +1,7 @@
+from __future__ import print_function
 from future import standard_library
 standard_library.install_aliases()
+
 from email.mime.text import MIMEText
 import glob
 from io import StringIO
@@ -401,7 +403,8 @@ def make_redis_check(host, port, password=None, timeout=None,
                      **kwargs):
     """Make a check for the configured redis server."""
     if sys.version_info[0] >=3:
-        raise EnvironmentError('Redis checks are not supported in python 3')
+        print('Redis checks are not supported in python 3.\n'
+            'This may help: https://github.com/deldotdr/txRedis/pull/58')
     import txredis
     subchecks = []
     subchecks.append(make_tcp_check(host, port, timeout=timeout))
