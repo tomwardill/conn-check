@@ -277,7 +277,7 @@ class Command(object):
         parser.add_argument("--connect-timeout", dest="connect_timeout",
                             action="store", default=10, type=float,
                             help="Network connection timeout.")
-        parser.add_argument("-", "--unbuffered-output", dest="buffer_output",
+        parser.add_argument("-u", "--unbuffered-output", dest="buffer_output",
                             action="store_false", default=True,
                             help="Don't buffer output, write to STDOUT right "
                             "away.")
